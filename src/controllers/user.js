@@ -63,20 +63,36 @@ exports.getUser = async (req, res) => {
     }
 }
 
-// exports.deleteUser = async (req, res) => {
-//     try {
-//         const {id} = req.params
-//         users = users.filter((user) => user.id != id);
-//         res.send({
-//             status: "DELETE DATA SUCCESS",
-//             data: users
-//         })
-//     } catch (err) {
-//         console.log(err)
-//         return res.status(500).send({
-//             error: {
-//                 message: "Server Error"
-//             }
-//         })
-//     }
-// }
+exports.deleteUser = async (req, res) => {
+    try {
+        const {id} = req.params;
+
+        const isUserExist = await User.findOne({
+            where: {
+                id
+            }
+        });
+        if (!isUserExist) {
+            return res.status(400).send({
+                status: `USER WITH ID:${id} DOES NOT EXIST`,
+                data: {
+                    user: []
+                }
+            })
+        }
+
+        await User.destroy({
+            where: {
+                id
+            }
+        });
+        res.send({
+            status: "DELETE USER SUCCESS",
+            data: {
+                user: null
+            }
+        })
+    } catch (err) {
+        return errorResponse(err, res);
+    }
+}
