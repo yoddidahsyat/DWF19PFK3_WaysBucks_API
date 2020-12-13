@@ -4,12 +4,13 @@ const router = express.Router()
 
 const { getProducts, getProduct, addProduct, updateProduct, deleteProduct } = require('../controllers/product')
 const { getToppings, getTopping, addTopping, updateTopping, deleteTopping } = require('../controllers/topping')
-const { getUsers, getUser, deleteUser } = require('../controllers/user')
+const { getUsers, getUser, deleteUser, restoreUser } = require('../controllers/user')
 
 // ---------------- USERS --------------------- //
 router.get('/users', getUsers)
 router.get('/user/:id', getUser)
 router.delete('/user/:id', deleteUser)
+router.post('/user/:id', restoreUser)
 
 
 // --------------- PRODUCTS ------------------- //

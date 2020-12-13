@@ -62,7 +62,7 @@ exports.getUser = async (req, res) => {
         })
     }
 }
-
+// softdelete
 exports.deleteUser = async (req, res) => {
     try {
         const {id} = req.params;
@@ -87,9 +87,37 @@ exports.deleteUser = async (req, res) => {
             }
         });
         res.send({
-            status: "DELETE USER SUCCESS",
+            status: `DELETE USER WITH ID:${id} SUCCESS`,
             data: {
                 user: null
+            }
+        })
+    } catch (err) {
+        return errorResponse(err, res);
+    }
+}
+
+// restore
+exports.restoreUser = async (req, res) => {
+    try {
+        const {id} = req.params;
+
+        await User.restore({
+            where: {
+                id
+            }
+        });
+
+        user = await User.findOne({
+            where: {
+                id
+            }
+        })
+
+        res.send({
+            status: `RESTORE USER WITH ID:${id} SUCCESS`,
+            data: {
+                user
             }
         })
     } catch (err) {
