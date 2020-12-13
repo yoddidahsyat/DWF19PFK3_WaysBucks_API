@@ -128,3 +128,43 @@ exports.updateProduct = async (req, res) => {
         })
     }
 }
+
+exports.deleteProduct = async (req, res) => {
+    try {
+        const {id} = req.params;
+
+        const isProductExist = await Product.findOne({
+            where: {
+                id
+            }
+        });
+        if (!isProductExist) {
+            return res.status(400).send({
+                status: `PRODUCT WITH ID:${id} DOES NOT EXIST`,
+                data: {
+                    product: []
+                }
+            })
+        }
+
+        await Product.destroy({
+            where: {
+                id
+            }
+        });
+
+        res.send({
+            status: "DELETE PRODUCT SUCCESS",
+            data: {
+                product: null
+            }
+        })
+    } catch (err) {
+        console.log(err)
+        return res.status(500).send({
+            error: {
+                message: "Server Error"
+            }
+        })
+    }
+}
