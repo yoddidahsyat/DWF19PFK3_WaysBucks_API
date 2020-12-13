@@ -30,15 +30,15 @@ exports.getToppings = async (req, res) => {
 exports.getTopping = async (req, res) => {
     try {
         const {id} = req.params;
-        const topping = await Topping.findAll({
+        const topping = await Topping.findOne({
             where: {
                 id
             }
         });
 
-        if(topping.length === 0) {
+        if(!topping) {
             return res.status(400).send({
-                status: "TOPPING IS NOT EXIST",
+                status: `TOPPING WITH ID:${id} DOES NOT EXIST`,
                 data: []
             })
         }

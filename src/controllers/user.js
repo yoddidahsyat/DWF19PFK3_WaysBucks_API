@@ -7,7 +7,9 @@ exports.getUsers = async (req, res) => {
         if(users.length === 0) {
             return res.status(400).send({
                 status: "USERS DATA EMPTY",
-                data: []
+                data: {
+                    users: []
+                }
             })
         }
 
@@ -30,16 +32,18 @@ exports.getUsers = async (req, res) => {
 exports.getUser = async (req, res) => {
     try {
         const {id} = req.params;
-        const user = await User.findAll({
+        const user = await User.findOne({
             where: {
                 id
             }
         });
 
-        if(user.length === 0) {
+        if(!user) {
             return res.status(400).send({
-                status: "USER IS NOT EXIST",
-                data: []
+                status: `USER WITH ID:${id} DOES NOT EXIST`,
+                data: {
+                    user: []
+                }
             })
         }
 

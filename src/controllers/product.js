@@ -30,16 +30,18 @@ exports.getProducts = async (req, res) => {
 exports.getProduct = async (req, res) => {
     try {
         const {id} = req.params;
-        const product = await Product.findAll({
+        const product = await Product.findOne({
             where: {
                 id
             }
         });
 
-        if(product.length === 0) {
+        if(!product) {
             return res.status(400).send({
-                status: "PRODUCT IS NOT EXIST",
-                data: []
+                status: `PRODUCT WITH ID:${id} DOES NOT EXIST`,
+                data: {
+                    product: []
+                }
             })
         }
 
