@@ -60,3 +60,24 @@ exports.getProduct = async (req, res) => {
         })
     }
 }
+
+exports.addProduct = async (req, res) => {
+    try {
+        const { body: productData } = req;
+        const product = await Product.create(productData);
+
+        res.send({
+            status: "ADD PRODUCT SUCCESS",
+            data: {
+                product
+            }
+        })
+    } catch (err) {
+        console.log(err)
+        return res.status(500).send({
+            error: {
+                message: "Server Error"
+            }
+        })
+    }
+}
