@@ -2,7 +2,7 @@ const express = require('express')
 const router = express.Router()
 
 
-const { getProducts, getProduct, addProduct } = require('../controllers/product')
+const { getProducts, getProduct, addProduct, updateProduct } = require('../controllers/product')
 const { getToppings, getTopping } = require('../controllers/topping')
 const { getUsers, getUser } = require('../controllers/user')
 
@@ -16,6 +16,7 @@ router.get('/user/:id', getUser)
 router.get('/products', getProducts)
 router.get('/product/:id', getProduct)
 router.post('/product', addProduct)
+router.patch('/product/:id', updateProduct)
 
 
 // --------------- TOPPINGS ------------------- //

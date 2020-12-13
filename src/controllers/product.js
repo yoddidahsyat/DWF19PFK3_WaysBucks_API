@@ -81,3 +81,50 @@ exports.addProduct = async (req, res) => {
         })
     }
 }
+
+exports.updateProduct = async (req, res) => {
+    try {
+        const {id} = req.params;
+        const { body: productData } = req;
+
+        const isProductExist = await Product.findOne({
+            where: {
+                id
+            }
+        });
+        if (!isProductExist) {
+            return res.status(400).send({
+                status: `PRODUCT WITH ID:${id} DOES NOT EXIST`,
+                data: {
+                    product: []
+                }
+            })
+        }
+
+        const product = await Product.update(productData, {
+            where: {
+                id
+            }
+        });
+
+        const newProduct = await Product.findOne({
+            where: {
+                id
+            }
+        });
+
+        res.send({
+            status: "UPDATE PRODUCT SUCCESS",
+            data: {
+                product: newProduct
+            }
+        })
+    } catch (err) {
+        console.log(err)
+        return res.status(500).send({
+            error: {
+                message: "Server Error"
+            }
+        })
+    }
+}
