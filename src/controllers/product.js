@@ -1,13 +1,20 @@
 const { Product } = require('../../models/');
 
+const errorResponse = (err, res) => {
+    console.log(err);
+    res.status(500).send({ error: { message: "Server Error" } })
+}
+
 exports.getProducts = async (req, res) => {
     try {
         const products = await Product.findAll();
 
-        if(products.lengt === 0) {
+        if(products.length === 0) {
             return res.status(400).send({
                 status: "PRODUCTS DATA EMPTY",
-                data: []
+                data: {
+                    product: []
+                }
             })
         }
 
@@ -18,12 +25,7 @@ exports.getProducts = async (req, res) => {
             }
         })
     } catch (err) {
-        console.log(err)
-        return res.status(500).send({
-            error: {
-                message: "Server Error"
-            }
-        })
+        return errorResponse(err, res);
     }
 }
 
@@ -52,12 +54,7 @@ exports.getProduct = async (req, res) => {
             }
         })
     } catch (err) {
-        console.log(err)
-        return res.status(500).send({
-            error: {
-                message: "Server Error"
-            }
-        })
+        return errorResponse(err, res);
     }
 }
 
@@ -65,7 +62,6 @@ exports.addProduct = async (req, res) => {
     try {
         const { body: productData } = req;
         const product = await Product.create(productData);
-
         res.send({
             status: "ADD PRODUCT SUCCESS",
             data: {
@@ -73,12 +69,7 @@ exports.addProduct = async (req, res) => {
             }
         })
     } catch (err) {
-        console.log(err)
-        return res.status(500).send({
-            error: {
-                message: "Server Error"
-            }
-        })
+        return errorResponse(err, res);
     }
 }
 
@@ -101,7 +92,7 @@ exports.updateProduct = async (req, res) => {
             })
         }
 
-        const product = await Product.update(productData, {
+        await Product.update(productData, {
             where: {
                 id
             }
@@ -120,12 +111,7 @@ exports.updateProduct = async (req, res) => {
             }
         })
     } catch (err) {
-        console.log(err)
-        return res.status(500).send({
-            error: {
-                message: "Server Error"
-            }
-        })
+        return errorResponse(err, res);
     }
 }
 
@@ -152,7 +138,6 @@ exports.deleteProduct = async (req, res) => {
                 id
             }
         });
-
         res.send({
             status: "DELETE PRODUCT SUCCESS",
             data: {
@@ -160,11 +145,6 @@ exports.deleteProduct = async (req, res) => {
             }
         })
     } catch (err) {
-        console.log(err)
-        return res.status(500).send({
-            error: {
-                message: "Server Error"
-            }
-        })
+        return errorResponse(err, res);
     }
 }
