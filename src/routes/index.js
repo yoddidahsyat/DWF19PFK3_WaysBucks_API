@@ -2,13 +2,8 @@ const express = require('express')
 const router = express.Router()
 
 
-<<<<<<< HEAD
 const { getProducts, getProduct, addProduct, updateProduct, deleteProduct } = require('../controllers/product')
-const { getToppings, getTopping } = require('../controllers/topping')
-=======
-const { getProducts, getProduct } = require('../controllers/product')
 const { getToppings, getTopping, addTopping, updateTopping, deleteTopping } = require('../controllers/topping')
->>>>>>> 5.Topping
 const { getUsers, getUser } = require('../controllers/user')
 
 // ---------------- USERS --------------------- //
