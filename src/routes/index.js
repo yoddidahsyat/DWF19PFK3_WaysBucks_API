@@ -8,7 +8,7 @@ const { register, login, checkAuth } = require('../controllers/auth');
 const { getProducts, getProduct, addProduct, updateProduct, deleteProduct } = require('../controllers/product')
 const { getToppings, getTopping, addTopping, updateTopping, deleteTopping } = require('../controllers/topping')
 const { getUsers, getUser, deleteUser, restoreUser } = require('../controllers/user')
-const { getTransactions, getTransaction, addTransaction, updateTransaction } = require('../controllers/transaction')
+const { getTransactions, getTransaction, addTransaction, updateTransaction, uploadPayment } = require('../controllers/transaction')
 
 // ---------------------- AUTH ------------------------ //
 router.post('/auth/register', register)
@@ -43,5 +43,6 @@ router.get('/transactions', auth, getTransactions)
 router.get('/transaction/:id', auth, getTransaction)
 router.post('/transaction', auth, addTransaction)
 router.patch('/transaction/:id', auth, updateTransaction)
+router.patch('/transaction/payment/:id', auth, uploadFile('attachment'), uploadPayment)
 
 module.exports = router

@@ -194,7 +194,6 @@ exports.updateTransaction = async (req, res) => {
     try {
         const { id } = req.params;
         const { body: transactionData } = req;
-        console.log(id, transactionData);
 
         const isTransactionExist = await Transaction.findOne({
             where: {
@@ -222,7 +221,59 @@ exports.updateTransaction = async (req, res) => {
                 id
             },
             attributes: {
-                exclude: ["createdAt", "updatedAt"],
+                exclude: ["createdAt", "updatedAt", "UserId"],
+            }
+        });
+
+        res.send({
+            status: statusSuccess,
+            message: messageSuccessSingle(id, "updated"),
+            data: {
+                transaction: newTransaction
+            }
+        })
+    } catch (err) {
+        return errorResponse(err, res);
+    }
+}
+
+
+exports.uploadPayment = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { body, file } = req;
+        const transactionData = {
+            ...body,
+            attachment: file.filename
+        }
+
+        const isTransactionExist = await Transaction.findOne({
+            where: {
+                id
+            }
+        });
+        if (!isTransactionExist) {
+            return res.status(400).send({
+                status: statusFailed,
+                message: messageFailedSingle(id),
+                data: {
+                    transaction: []
+                }
+            })
+        }
+
+        await Transaction.update(transactionData, {
+            where: {
+                id
+            }
+        });
+
+        const newTransaction = await Transaction.findOne({
+            where: {
+                id
+            },
+            attributes: {
+                exclude: ["createdAt", "updatedAt", "UserId"],
             }
         });
 
