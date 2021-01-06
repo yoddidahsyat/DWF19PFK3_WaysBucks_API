@@ -1,5 +1,4 @@
-const { Transaction } = require('../../models');
-const user = require('../../models/user');
+const { Transaction, TransactionProduct, TransactionTopping, User, Product, Topping } = require('../../models');
 
 const errorResponse = (err, res) => {
     console.log(err);
@@ -8,7 +7,51 @@ const errorResponse = (err, res) => {
 
 exports.getTransactions = async (req, res) => {
     try {
-        const transaction = await Transaction.findAll();
+        const transaction = await Transaction.findAll({
+            attributes: {
+                exclude: ["createdAt", "updatedAt", "userId", "UserId"],
+            },
+            include: [
+                {
+                    model: User,
+                    // as: "user",
+                    attributes: {
+                        exclude: ["password", "createdAt", "updatedAt", "deletedAt", "userId", "UserId"],
+                    },
+                },
+                {
+                    model: TransactionProduct,
+                    // as: "transactionproduct",
+                    attributes: {
+                        exclude: ["transactionId", "createdAt", "updatedAt", "productId"],
+                    },
+                    include: [
+                        {
+                            model: Product,
+                            // as: "product",
+                            attributes: {
+                                exclude: ["createdAt", "updatedAt", "ProductId", "TransactionId"]
+                            }
+                        },
+                        {
+                            model: TransactionTopping,
+                            // as: "transactiontopping",
+                            include: [
+                                {
+                                    model: Topping,
+                                    attributes: {
+                                        exclude: ["createdAt", "updatedAt", "ProductId", "TransactionId"]
+                                    }
+                                }
+                            ],
+                            attributes: {
+                                exclude: ["transactionProductId", "createdAt", "updatedAt", "TransactionProductId"],
+                            }
+                        }
+                    ]
+                }
+            ]
+        });
 
         if(transaction.length === 0) {
             return res.status(400).send({
