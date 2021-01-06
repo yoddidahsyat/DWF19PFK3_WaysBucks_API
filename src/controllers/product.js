@@ -1,5 +1,11 @@
 const { Product } = require('../../models/');
 
+const statusSuccess = "SUCCESS";
+const statusFailed = "FAILED";
+const messageSuccess = (type) => { return `Product successfully ${type}` }
+const messageSuccessSingle = (id, type) => { return `Product with id: ${id} successfully ${type}` }
+const messageFailedSingle = (id) => { return `Product with id: ${id} does not exist` };
+const messageEmpty = "Data Empty";
 const errorResponse = (err, res) => {
     console.log(err);
     res.status(500).send({ error: { message: "Server Error" } })
@@ -7,11 +13,16 @@ const errorResponse = (err, res) => {
 
 exports.getProducts = async (req, res) => {
     try {
-        const products = await Product.findAll();
+        const products = await Product.findAll({
+            attributes: {
+                exclude: ["createdAt", "updatedAt"]
+            }
+        });
 
         if(products.length === 0) {
-            return res.status(400).send({
-                status: "PRODUCTS DATA EMPTY",
+            return res.send({
+                status: statusFailed,
+                message: messageEmpty,
                 data: {
                     product: []
                 }
@@ -19,7 +30,8 @@ exports.getProducts = async (req, res) => {
         }
 
         res.send({
-            status: "GET PRODUCTS SUCCESS",
+            status: statusSuccess,
+            message: messageSuccess('get'),
             data: {
                 products
             }
@@ -35,12 +47,16 @@ exports.getProduct = async (req, res) => {
         const product = await Product.findOne({
             where: {
                 id
+            },
+            attributes: {
+                exclude: ["createdAt", "updatedAt"]
             }
         });
 
         if(!product) {
             return res.status(400).send({
-                status: `PRODUCT WITH ID:${id} DOES NOT EXIST`,
+                status: statusFailed,
+                message: messageFailedSingle(id),
                 data: {
                     product: []
                 }
@@ -48,7 +64,8 @@ exports.getProduct = async (req, res) => {
         }
 
         res.send({
-            status: "GET PRODUCT SUCCESS",
+            status: statusSuccess,
+            message: messageSuccess('get'),
             data: {
                 product
             }
@@ -60,10 +77,15 @@ exports.getProduct = async (req, res) => {
 
 exports.addProduct = async (req, res) => {
     try {
-        const { body: productData } = req;
+        const { body, file } = req;
+        const productData = {
+            ...body,
+            image: file.filename
+        }
         const product = await Product.create(productData);
         res.send({
-            status: "ADD PRODUCT SUCCESS",
+            status: statusSuccess,
+            message: messageSuccess('added'),
             data: {
                 product
             }
@@ -85,7 +107,8 @@ exports.updateProduct = async (req, res) => {
         });
         if (!isProductExist) {
             return res.status(400).send({
-                status: `PRODUCT WITH ID:${id} DOES NOT EXIST`,
+                status: statusFailed,
+                message: messageFailedSingle(id),
                 data: {
                     product: []
                 }
@@ -105,7 +128,8 @@ exports.updateProduct = async (req, res) => {
         });
 
         res.send({
-            status: "UPDATE PRODUCT SUCCESS",
+            status: statusSuccess,
+            message: messageSuccess('updated'),
             data: {
                 product: newProduct
             }
@@ -126,7 +150,8 @@ exports.deleteProduct = async (req, res) => {
         });
         if (!isProductExist) {
             return res.status(400).send({
-                status: `PRODUCT WITH ID:${id} DOES NOT EXIST`,
+                status: statusFailed,
+                message: messageFailedSingle(id),
                 data: {
                     product: []
                 }
@@ -139,7 +164,8 @@ exports.deleteProduct = async (req, res) => {
             }
         });
         res.send({
-            status: "DELETE PRODUCT SUCCESS",
+            status: statusSuccess,
+            message: messageSuccess('deleted'),
             data: {
                 product: null
             }

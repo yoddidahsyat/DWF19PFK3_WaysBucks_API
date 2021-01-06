@@ -1,5 +1,11 @@
 const { Transaction, TransactionProduct, TransactionTopping, User, Product, Topping } = require('../../models');
 
+const statusSuccess = "SUCCESS";
+const statusFailed = "FAILED";
+const messageSuccess = (type) => { return `Transaction successfully ${type}` }
+const messageSuccessSingle = (id, type) => { return `Transaction with id: ${id} successfully ${type}` }
+const messageFailedSingle = (id) => { return `Transaction with id: ${id} does not exist` };
+const messageEmpty = "Data Empty";
 const errorResponse = (err, res) => {
     console.log(err);
     res.status(500).send({ error: { message: "Server Error" } })
@@ -7,55 +13,132 @@ const errorResponse = (err, res) => {
 
 exports.getTransactions = async (req, res) => {
     try {
-        const transaction = await Transaction.findAll({
+        const transactions = await Transaction.findAll({
             attributes: {
                 exclude: ["createdAt", "updatedAt", "userId", "UserId"],
             },
             include: [
                 {
                     model: User,
-                    // as: "user",
+                    as: "user",
                     attributes: {
                         exclude: ["password", "createdAt", "updatedAt", "deletedAt", "userId", "UserId"],
                     },
                 },
                 {
                     model: TransactionProduct,
-                    // as: "transactionproduct",
+                    as: "transactionProduct",
                     attributes: {
-                        exclude: ["transactionId", "createdAt", "updatedAt", "productId"],
+                        exclude: ["createdAt", "updatedAt", "productId", "ProductId", "transactionId", "TransactionId", ],
                     },
                     include: [
                         {
                             model: Product,
-                            // as: "product",
+                            as: "product",
                             attributes: {
-                                exclude: ["createdAt", "updatedAt", "ProductId", "TransactionId"]
+                                exclude: ["createdAt", "updatedAt", "ProductId"]
                             }
                         },
                         {
                             model: TransactionTopping,
-                            // as: "transactiontopping",
+                            as: "transactionTopping",
+                            attributes: {
+                                exclude: ["transactionProductId", "createdAt", "updatedAt", "TransactionProductId", "ToppingId", "toppingId"],
+                            },
                             include: [
                                 {
                                     model: Topping,
+                                    as: "topping",
                                     attributes: {
-                                        exclude: ["createdAt", "updatedAt", "ProductId", "TransactionId"]
+                                        exclude: ["createdAt", "updatedAt"]
                                     }
                                 }
-                            ],
-                            attributes: {
-                                exclude: ["transactionProductId", "createdAt", "updatedAt", "TransactionProductId"],
-                            }
+                            ]
                         }
                     ]
                 }
             ]
         });
 
-        if(transaction.length === 0) {
+        if(transactions.length === 0) {
+            return res.send({
+                status: statusFailed,
+                message: messageEmpty,
+                data: {
+                    transactions: []
+                }
+            })
+        }
+
+        res.send({
+            status: statusSuccess,
+            message: messageSuccess("get"),
+            data: {
+                transactions
+            }
+        })
+    } catch (err) {
+        return errorResponse(err, res);
+    }
+}
+
+exports.getTransaction = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const transaction = await Transaction.findOne({
+            where: {
+                id
+            },
+            attributes: {
+                exclude: ["createdAt", "updatedAt", "userId", "UserId"],
+            },
+            include: [
+                {
+                    model: User,
+                    as: "user",
+                    attributes: {
+                        exclude: ["password", "createdAt", "updatedAt", "deletedAt", "userId", "UserId"],
+                    },
+                },
+                {
+                    model: TransactionProduct,
+                    as: "transactionProduct",
+                    attributes: {
+                        exclude: ["createdAt", "updatedAt", "productId", "ProductId", "transactionId", "TransactionId", ],
+                    },
+                    include: [
+                        {
+                            model: Product,
+                            as: "product",
+                            attributes: {
+                                exclude: ["createdAt", "updatedAt", "ProductId"]
+                            }
+                        },
+                        {
+                            model: TransactionTopping,
+                            as: "transactionTopping",
+                            attributes: {
+                                exclude: ["transactionProductId", "createdAt", "updatedAt", "TransactionProductId", "ToppingId", "toppingId"],
+                            },
+                            include: [
+                                {
+                                    model: Topping,
+                                    as: "topping",
+                                    attributes: {
+                                        exclude: ["createdAt", "updatedAt", "ToppingId"]
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        });
+
+        if(!transaction) {
             return res.status(400).send({
-                status: "TRANSACTION DATA EMPTY",
+                status: statusFailed,
+                message: messageFailedSingle(id),
                 data: {
                     transaction: []
                 }
@@ -63,7 +146,40 @@ exports.getTransactions = async (req, res) => {
         }
 
         res.send({
-            status: "GET TRANSACTION SUCCESS",
+            status: statusSuccess,
+            message: messageSuccessSingle(id, "get"),
+            data: {
+                transaction
+            }
+        })
+    } catch (err) {
+        errorResponse(err,res);
+    }
+}
+
+
+exports.addTransaction = async (req, res) => {
+    try {
+        const { body, user } = req;
+        const userId = user.id;
+        const transactionData = {
+            ...body,
+            userId,
+            attachment: null
+        }
+        console.log(transactionData);
+        
+        const transaction = await Transaction.create(transactionData, {
+            include: [{
+                association: "transactionProduct",
+                include: [{
+                    association: "transactionTopping"
+                }]
+            }]
+        });
+        res.send({
+            status: statusSuccess,
+            message: messageSuccess("created"),
             data: {
                 transaction
             }
@@ -73,98 +189,51 @@ exports.getTransactions = async (req, res) => {
     }
 }
 
-// exports.getUser = async (req, res) => {
-//     try {
-//         const {id} = req.params;
-//         const user = await User.findOne({
-//             where: {
-//                 id
-//             }
-//         });
 
-//         if(!user) {
-//             return res.status(400).send({
-//                 status: `USER WITH ID:${id} DOES NOT EXIST`,
-//                 data: {
-//                     user: []
-//                 }
-//             })
-//         }
+exports.updateTransaction = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { body: transactionData } = req;
+        console.log(id, transactionData);
 
-//         res.send({
-//             status: "GET USER SUCCESS",
-//             data: {
-//                 user
-//             }
-//         })
-//     } catch (err) {
-//         console.log(err)
-//         return res.status(500).send({
-//             error: {
-//                 message: "Server Error"
-//             }
-//         })
-//     }
-// }
-// // softdelete
-// exports.deleteUser = async (req, res) => {
-//     try {
-//         const {id} = req.params;
+        const isTransactionExist = await Transaction.findOne({
+            where: {
+                id
+            }
+        });
+        if (!isTransactionExist) {
+            return res.status(400).send({
+                status: statusFailed,
+                message: messageFailedSingle(id),
+                data: {
+                    transaction: []
+                }
+            })
+        }
 
-//         const isUserExist = await User.findOne({
-//             where: {
-//                 id
-//             }
-//         });
-//         if (!isUserExist) {
-//             return res.status(400).send({
-//                 status: `USER WITH ID:${id} DOES NOT EXIST`,
-//                 data: {
-//                     user: []
-//                 }
-//             })
-//         }
+        await Transaction.update(transactionData, {
+            where: {
+                id
+            }
+        });
 
-//         await User.destroy({
-//             where: {
-//                 id
-//             }
-//         });
-//         res.send({
-//             status: `DELETE USER WITH ID:${id} SUCCESS`,
-//             data: {
-//                 user: null
-//             }
-//         })
-//     } catch (err) {
-//         return errorResponse(err, res);
-//     }
-// }
+        const newTransaction = await Transaction.findOne({
+            where: {
+                id
+            },
+            attributes: {
+                exclude: ["createdAt", "updatedAt"],
+            }
+        });
 
-// // restore
-// exports.restoreUser = async (req, res) => {
-//     try {
-//         const {id} = req.params;
-
-//         await User.restore({
-//             where: {
-//                 id
-//             }
-//         });
-
-//         user = await User.findOne({
-//             where: {
-//                 id
-//             }
-//         })
-
-//         res.send({
-//             status: `RESTORE USER WITH ID:${id} SUCCESS`,
-//             data: {
-//                 user
-//             }
-//         })
-//     } catch (err) {
-//         return errorResponse(err, res);
-//     }
-// }
+        res.send({
+            status: statusSuccess,
+            message: messageSuccessSingle(id, "updated"),
+            data: {
+                transaction: newTransaction
+            }
+        })
+    } catch (err) {
+        return errorResponse(err, res);
+    }
+}

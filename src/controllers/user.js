@@ -1,8 +1,12 @@
-const { User, Transaction } = require('../../models/');
+const { User, Transaction, TransactionProduct, TransactionTopping, Product, Topping} = require('../../models/');
 
 exports.getUsers = async (req, res) => {
     try {
-        const users = await User.findAll();
+        const users = await User.findAll({
+            attributes: {
+                exclude: ["createdAt", "updatedAt", "deletedAt", "password"]
+            }
+        });
 
         if(users.length === 0) {
             return res.status(400).send({
@@ -35,6 +39,48 @@ exports.getUser = async (req, res) => {
         const user = await User.findOne({
             where: {
                 id
+            },
+            attributes: {
+                exclude: ["createdAt", "updatedAt", "deletedAt", "password"]
+            },
+            include: {
+                model: Transaction,
+                as: 'transactions',
+                attributes: {
+                    exclude: ["createdAt", "updatedAt", "userId", "UserId"]
+                },
+                include: {
+                    model: TransactionProduct,
+                    as: "transactionProduct",
+                    attributes: {
+                        exclude: ["createdAt", "updatedAt", "productId", "ProductId", "transactionId", "TransactionId" ],
+                    },
+                    include: [
+                        {
+                            model: Product,
+                            as: "product",
+                            attributes: {
+                                exclude: ["createdAt", "updatedAt", "ProductId"]
+                            }
+                        },
+                        {
+                            model: TransactionTopping,
+                            as: "transactionTopping",
+                            attributes: {
+                                exclude: ["createdAt", "updatedAt", "transactionProductId", "TransactionProductId", "ToppingId", "toppingId"],
+                            },
+                            include: [
+                                {
+                                    model: Topping,
+                                    as: "topping",
+                                    attributes: {
+                                        exclude: ["createdAt", "updatedAt", "ToppingId"]
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }
             }
         });
 

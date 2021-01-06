@@ -1,27 +1,35 @@
 const { Topping } = require('../../models/');
 
+const statusSuccess = "SUCCESS";
+const statusFailed = "FAILED";
+const messageSuccess = (type) => { return `Topping successfully ${type}` }
+const messageSuccessSingle = (id, type) => { return `Topping with id: ${id} successfully ${type}` }
+const messageFailedSingle = (id) => { return `Topping with id: ${id} does not exist` };
+const messageEmpty = "Data Empty";
 const errorResponse = (err, res) => {
-    console.log(err)
-    return res.status(500).send({
-        error: {
-            message: "Server Error"
-        }
-    })
+    console.log(err);
+    res.status(500).send({ error: { message: "Server Error" } })
 }
 
 exports.getToppings = async (req, res) => {
     try {
-        const toppings = await Topping.findAll();
+        const toppings = await Topping.findAll({
+            attributes: {
+                exclude: ["createdAt", "updatedAt"]
+            }
+        });
 
         if(!toppings) {
-            return res.status(400).send({
-                status: "DATA TOPPINGS EMPTY",
+            return res.send({
+                status: statusFailed,
+                message: messageEmpty,
                 data: []
             })
         }
 
         res.send({
-            status: "GET TOPPINGS SUCCESS",
+            status: statusSuccess,
+            message: messageSuccess('get'),
             data: {
                 toppings
             }
@@ -37,12 +45,16 @@ exports.getTopping = async (req, res) => {
         const topping = await Topping.findOne({
             where: {
                 id
+            },
+            attributes: {
+                exclude: ["createdAt", "updatedAt"]
             }
         });
 
         if(!topping) {
-            return res.status(400).send({
-                status: `TOPPING WITH ID:${id} DOES NOT EXIST`,
+            return res.send({
+                status: statusFailed,
+                message: messageEmpty,
                 data: {
                     topping: []
                 }
@@ -50,7 +62,8 @@ exports.getTopping = async (req, res) => {
         }
 
         res.send({
-            status: "GET TOPPING SUCCESS",
+            status: statusSuccess,
+            message: messageSuccess('get'),
             data: {
                 topping
             }
@@ -62,10 +75,15 @@ exports.getTopping = async (req, res) => {
 
 exports.addTopping = async (req, res) => {
     try {
-        const { body: toppingData } = req;
+        const { body, file } = req;
+        const toppingData = {
+            ...body,
+            image: file.filename
+        }
         const topping = await Topping.create(toppingData);
         res.send({
-            status: "ADD TOPPING SUCCESS",
+            status: statusSuccess,
+            message: messageSuccess('added'),
             data: {
                 topping
             }
@@ -87,7 +105,8 @@ exports.updateTopping = async (req, res) => {
         });
         if (!isToppingExist) {
             return res.status(400).send({
-                status: `TOPPING WITH ID:${id} DOES NOT EXIST`,
+                status: statusFailed,
+                message: messageFailedSingle(id),
                 data: {
                     topping: []
                 }
@@ -107,7 +126,8 @@ exports.updateTopping = async (req, res) => {
         });
 
         res.send({
-            status: "UPDATE TOPPING SUCCESS",
+            status: statusSuccess,
+            message: messageSuccess('updated'),
             data: {
                 topping: newTopping
             }
@@ -128,7 +148,8 @@ exports.deleteTopping = async (req, res) => {
         });
         if (!isToppingExist) {
             return res.status(400).send({
-                status: `TOPPING WITH ID:${id} DOES NOT EXIST`,
+                status: statusFailed,
+                message: messageFailedSingle(id),
                 data: {
                     topping: []
                 }
@@ -141,7 +162,8 @@ exports.deleteTopping = async (req, res) => {
             }
         });
         res.send({
-            status: "DELETE TOPPING SUCCESS",
+            status: statusSuccess,
+            message: messageSuccessSingle(id),
             data: {
                 topping: null
             }
