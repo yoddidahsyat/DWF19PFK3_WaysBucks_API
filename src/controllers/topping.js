@@ -19,11 +19,13 @@ exports.getToppings = async (req, res) => {
             }
         });
 
-        if(!toppings) {
+        if(toppings.length < 1) {
             return res.send({
                 status: statusFailed,
                 message: messageEmpty,
-                data: []
+                data: {
+                    topppings: []
+                }
             })
         }
 
@@ -163,7 +165,7 @@ exports.deleteTopping = async (req, res) => {
         });
         res.send({
             status: statusSuccess,
-            message: messageSuccessSingle(id),
+            message: messageSuccessSingle(id, 'deleted'),
             data: {
                 topping: null
             }

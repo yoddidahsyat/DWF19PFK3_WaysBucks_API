@@ -17,7 +17,7 @@ router.get('/auth', auth, checkAuth)
 
 // --------------------- USERS --------------------- //
 router.get('/users', auth, getUsers)
-router.get('/user/:id', auth, getUser)
+router.get('/user', auth, getUser)
 router.delete('/user/:id', auth, deleteUser)
 router.post('/user/:id', auth, restoreUser)
 
