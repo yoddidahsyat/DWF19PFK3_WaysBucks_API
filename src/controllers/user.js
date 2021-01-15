@@ -24,7 +24,7 @@ exports.getUsers = async (req, res) => {
             }
         })
     } catch (err) {
-        console.log(err)
+        console.log(err);
         return res.status(500).send({
             error: {
                 message: "Server Error"
@@ -100,7 +100,7 @@ exports.getUser = async (req, res) => {
             }
         })
     } catch (err) {
-        console.log(err)
+        console.log(err);
         return res.status(500).send({
             error: {
                 message: "Server Error"
@@ -139,7 +139,12 @@ exports.deleteUser = async (req, res) => {
             }
         })
     } catch (err) {
-        return errorResponse(err, res);
+        console.log(err);
+        return res.status(500).send({
+            error: {
+                message: "Server Error"
+            }
+        })
     }
 }
 
@@ -167,6 +172,52 @@ exports.restoreUser = async (req, res) => {
             }
         })
     } catch (err) {
-        return errorResponse(err, res);
+        console.log(err);
+        return res.status(500).send({
+            error: {
+                message: "Server Error"
+            }
+        })
+    }
+}
+
+
+exports.updateUser = async (req, res) => {
+    try {
+        const { id } = req.user;
+        const { body, file } = req;
+        const query = {
+            ...body,
+            avatar: file.filename
+        };
+
+        await User.update(query, {
+            where: {
+                id
+            }
+        })
+
+        const newUser = await User.findOne({
+            where: {
+                id
+            },
+            attributes: {
+                exclude: ["password", "createdAt", "deletedAt"]
+            }
+        })
+
+        res.send({
+            status: `USER WITH ID:${id} SUCCESSFULLY UPDATED`,
+            data: {
+                user: newUser
+            }
+        })
+    } catch (err) {
+        console.log(err);
+        return res.status(500).send({
+            error: {
+                message: "Server Error"
+            }
+        })
     }
 }

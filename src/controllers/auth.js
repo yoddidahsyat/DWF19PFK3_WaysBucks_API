@@ -69,6 +69,7 @@ exports.register = async (req, res) => {
                 name: user.name,
                 email: user.email,
                 role: user.role,
+                avatar: user.avatar,
                 token
             },
         });
@@ -135,6 +136,7 @@ exports.login = async (req, res) => {
                 name: user.name,
                 email: user.email,
                 role: user.role,
+                avatar: user.avatar,
                 token
             },
         });
@@ -160,6 +162,7 @@ exports.checkAuth = async(req, res) => {
                 name: user.name,
                 email: user.email,
                 role: user.role,
+                avatar: user.avatar
             }
         })
     } catch (err) {
