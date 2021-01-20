@@ -51,7 +51,7 @@ exports.getUser = async (req, res) => {
                 },
                 include: {
                     model: TransactionProduct,
-                    as: "transactionProduct",
+                    as: "transactionProducts",
                     attributes: {
                         exclude: ["createdAt", "updatedAt", "productId", "ProductId", "transactionId", "TransactionId" ],
                     },
@@ -65,7 +65,7 @@ exports.getUser = async (req, res) => {
                         },
                         {
                             model: TransactionTopping,
-                            as: "transactionTopping",
+                            as: "transactionToppings",
                             attributes: {
                                 exclude: ["createdAt", "updatedAt", "transactionProductId", "TransactionProductId", "ToppingId", "toppingId"],
                             },

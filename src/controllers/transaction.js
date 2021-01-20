@@ -27,7 +27,7 @@ exports.getTransactions = async (req, res) => {
                 },
                 {
                     model: TransactionProduct,
-                    as: "transactionProduct",
+                    as: "transactionProducts",
                     attributes: {
                         exclude: ["createdAt", "updatedAt", "productId", "ProductId", "transactionId", "TransactionId", ],
                     },
@@ -41,7 +41,7 @@ exports.getTransactions = async (req, res) => {
                         },
                         {
                             model: TransactionTopping,
-                            as: "transactionTopping",
+                            as: "transactionToppings",
                             attributes: {
                                 exclude: ["transactionProductId", "createdAt", "updatedAt", "TransactionProductId", "ToppingId", "toppingId"],
                             },
@@ -102,7 +102,7 @@ exports.getTransaction = async (req, res) => {
                 },
                 {
                     model: TransactionProduct,
-                    as: "transactionProduct",
+                    as: "transactionProducts",
                     attributes: {
                         exclude: ["createdAt", "updatedAt", "productId", "ProductId", "transactionId", "TransactionId", ],
                     },
@@ -116,7 +116,7 @@ exports.getTransaction = async (req, res) => {
                         },
                         {
                             model: TransactionTopping,
-                            as: "transactionTopping",
+                            as: "transactionToppings",
                             attributes: {
                                 exclude: ["transactionProductId", "createdAt", "updatedAt", "TransactionProductId", "ToppingId", "toppingId"],
                             },
@@ -171,9 +171,9 @@ exports.addTransaction = async (req, res) => {
         
         const transaction = await Transaction.create(transactionData, {
             include: [{
-                association: "transactionProduct",
+                association: "transactionProducts",
                 include: [{
-                    association: "transactionTopping"
+                    association: "transactionToppings"
                 }]
             }]
         });
@@ -282,6 +282,43 @@ exports.uploadPayment = async (req, res) => {
             message: messageSuccessSingle(id, "updated"),
             data: {
                 transaction: newTransaction
+            }
+        })
+    } catch (err) {
+        return errorResponse(err, res);
+    }
+}
+
+
+exports.deleteTransaction = async (req, res) => {
+    try {
+        const {id} = req.params;
+
+        const isTransactionExist = await Transaction.findOne({
+            where: {
+                id
+            }
+        });
+        if (!isTransactionExist) {
+            return res.status(400).send({
+                status: statusFailed,
+                message: messageFailedSingle(id),
+                data: {
+                    transaction: []
+                }
+            })
+        }
+
+        await Transaction.destroy({
+            where: {
+                id
+            }
+        });
+        res.send({
+            status: statusSuccess,
+            message: messageSuccess('deleted'),
+            data: {
+                transaction: null
             }
         })
     } catch (err) {

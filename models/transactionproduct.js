@@ -13,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
         // define association here
         TransactionProduct.belongsTo(models.Transaction, { as: "transaction" })
         TransactionProduct.belongsTo(models.Product, { as: "product" })
-        TransactionProduct.hasMany(models.TransactionTopping, { as: "transactionTopping" })
+        TransactionProduct.hasMany(models.TransactionTopping, { as: "transactionToppings" })
         }
     };
     TransactionProduct.init({
