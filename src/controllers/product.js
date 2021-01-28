@@ -19,7 +19,7 @@ exports.getProducts = async (req, res) => {
             }
         });
 
-        if(products.length === 0) {
+        if(products.length < 1) {
             return res.send({
                 status: statusFailed,
                 message: messageEmpty,
@@ -65,7 +65,7 @@ exports.getProduct = async (req, res) => {
 
         res.send({
             status: statusSuccess,
-            message: messageSuccess('get'),
+            message: messageSuccessSingle(id, 'get'),
             data: {
                 product
             }
@@ -129,7 +129,7 @@ exports.updateProduct = async (req, res) => {
 
         res.send({
             status: statusSuccess,
-            message: messageSuccess('updated'),
+            message: messageSuccessSingle(id, 'updated'),
             data: {
                 product: newProduct
             }
@@ -165,7 +165,7 @@ exports.deleteProduct = async (req, res) => {
         });
         res.send({
             status: statusSuccess,
-            message: messageSuccess('deleted'),
+            message: messageSuccessSingle(id, 'deleted'),
             data: {
                 product: null
             }
