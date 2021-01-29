@@ -7,7 +7,7 @@ const { auth } = require('../middlewares/auth');
 const { register, login, checkAuth } = require('../controllers/auth');
 const { getProducts, getProduct, addProduct, updateProduct, deleteProduct } = require('../controllers/product')
 const { getToppings, getTopping, addTopping, updateTopping, deleteTopping } = require('../controllers/topping')
-const { getUsers, getUser, deleteUser, restoreUser, updateUser } = require('../controllers/user')
+const { getUsers, getUser, deleteUser, updateUser } = require('../controllers/user')
 const { getTransactions, getTransaction, addTransaction, updateTransaction, uploadPayment, deleteTransaction } = require('../controllers/transaction')
 
 // ---------------------- AUTH ------------------------ //
@@ -19,7 +19,7 @@ router.get('/auth', auth, checkAuth)
 router.get('/users', auth, getUsers)
 router.get('/user', auth, getUser)
 router.delete('/user/:id', auth, deleteUser)
-router.post('/user/:id', auth, restoreUser)
+// router.post('/user/:id', auth, restoreUser)
 router.patch('/user', auth, uploadFile('avatar'), updateUser)
 
 
