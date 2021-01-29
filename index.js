@@ -19,7 +19,7 @@ const port = process.env.PORT || 5000;
 //use bodyparser
 app.use(express.json());
 
-//use cors
+//use cors   v
 app.use(cors());
 
 //akses upload directory
