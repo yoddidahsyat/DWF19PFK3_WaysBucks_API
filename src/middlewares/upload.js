@@ -1,16 +1,33 @@
 const multer = require("multer");
+const cloudinary = require("cloudinary").v2;
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
 
 exports.uploadFile = (fieldName) => {
   //initialisasi multer diskstorage
   //menentukan destination file diupload
   //menentukan nama file (rename agar tidak ada nama file ganda)
-    const storage = multer.diskStorage({
-        destination: function (req, file, cb) {
-            cb(null, "uploads"); //lokasi penyimpan file
-        },
-        filename: function (req, file, cb) {
-            cb(null, Date.now() + "-" + file.originalname); //rename nama file by date now + nama original
-        },
+    // const storage = multer.diskStorage({
+    //     destination: function (req, file, cb) {
+    //         cb(null, "uploads"); //lokasi penyimpan file
+    //     },
+    //     filename: function (req, file, cb) {
+    //         cb(null, Date.now() + "-" + file.originalname); //rename nama file by date now + nama original
+    //     },
+    // });
+    cloudinary.config({
+        cloud_name: process.env.CLOUD_NAME,
+        api_key: process.env.API_KEY,
+        api_secret: process.env.API_SECRET,
+    });
+    const storage = new CloudinaryStorage({
+        cloudinary: cloudinary,
+        params: async (req, file) => {
+          // async code using `req` and `file`
+            return {
+                folder: "waysbucks",
+                public_id: Date.now() + "-" + file.originalname,
+            };
+        }
     });
 
     //function untuk filter file berdasarkan type
@@ -34,8 +51,8 @@ exports.uploadFile = (fieldName) => {
         limits: {
             fileSize: maxSize,
         },
-    }).single(fieldName) // menggunakan multer.array untuk upload multiple files.
-    // Return array of files that will be stored in req.files.
+    }).single(fieldName) // menggunakan multer.array untuk upload single files.
+    // Return file that will be stored in req.file.
 
     //middleware handler
     return (req, res, next) => {
@@ -50,7 +67,7 @@ exports.uploadFile = (fieldName) => {
             //munculkan error jika melebihi max size
             if (err.code === "LIMIT_FILE_SIZE") {
                 return res.status(400).send({
-                    message: "Max file sized exceeded (8MB)",
+                    message: `Max file sized exceeded (${maxSize} MB)`,
                 });
             }
             
