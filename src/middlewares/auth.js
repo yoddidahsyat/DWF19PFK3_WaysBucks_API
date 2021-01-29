@@ -15,7 +15,7 @@ exports.auth = async (req, res, next) => {
     try {
         const token = header.replace("Bearer ", "");
         const verified = jwt.verify(token, privateKey);
-        console.log(verified);
+        // console.log(verified);
         req.user = verified;
         next();
     } catch (error) {
