@@ -149,37 +149,37 @@ exports.deleteUser = async (req, res) => {
 }
 
 // restore
-exports.restoreUser = async (req, res) => {
-    try {
-        const {id} = req.params;
+// exports.restoreUser = async (req, res) => {
+//     try {
+//         const {id} = req.params;
 
-        await User.restore({
-            where: {
-                id
-            }
-        });
+//         await User.restore({
+//             where: {
+//                 id
+//             }
+//         });
 
-        user = await User.findOne({
-            where: {
-                id
-            }
-        })
+//         user = await User.findOne({
+//             where: {
+//                 id
+//             }
+//         })
 
-        res.send({
-            status: `RESTORE USER WITH ID:${id} SUCCESS`,
-            data: {
-                user
-            }
-        })
-    } catch (err) {
-        console.log(err);
-        return res.status(500).send({
-            error: {
-                message: "Server Error"
-            }
-        })
-    }
-}
+//         res.send({
+//             status: `RESTORE USER WITH ID:${id} SUCCESS`,
+//             data: {
+//                 user
+//             }
+//         })
+//     } catch (err) {
+//         console.log(err);
+//         return res.status(500).send({
+//             error: {
+//                 message: "Server Error"
+//             }
+//         })
+//     }
+// }
 
 
 exports.updateUser = async (req, res) => {
