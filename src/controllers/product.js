@@ -80,7 +80,7 @@ exports.addProduct = async (req, res) => {
         const { body, file } = req;
         const productData = {
             ...body,
-            image: file.filename
+            image: file.path
         }
         const product = await Product.create(productData);
         res.send({
