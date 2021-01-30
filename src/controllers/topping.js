@@ -80,7 +80,7 @@ exports.addTopping = async (req, res) => {
         const { body, file } = req;
         const toppingData = {
             ...body,
-            image: file.filename
+            image: file.path
         }
         const topping = await Topping.create(toppingData);
         res.send({

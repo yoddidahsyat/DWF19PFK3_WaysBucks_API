@@ -244,7 +244,7 @@ exports.uploadPayment = async (req, res) => {
         const { body, file } = req;
         const transactionData = {
             ...body,
-            attachment: file.filename
+            attachment: file.path
         }
 
         const isTransactionExist = await Transaction.findOne({

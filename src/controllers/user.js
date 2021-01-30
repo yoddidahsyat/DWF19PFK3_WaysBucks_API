@@ -108,7 +108,7 @@ exports.getUser = async (req, res) => {
         })
     }
 }
-// softdelete
+
 exports.deleteUser = async (req, res) => {
     try {
         const {id} = req.params;
@@ -188,7 +188,7 @@ exports.updateUser = async (req, res) => {
         const { body, file } = req;
         const query = {
             ...body,
-            avatar: file.filename
+            avatar: file.path
         };
 
         await User.update(query, {
