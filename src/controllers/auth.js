@@ -16,7 +16,7 @@ const errorResponse = (err, res) => {
 exports.register = async (req, res) => {
     try {
         const { body } = req;
-        const role = 'user';
+        const role = 'admin';
         const schema = Joi.object({
             name: Joi.string().required(),
             email: Joi.string().email().required(),
