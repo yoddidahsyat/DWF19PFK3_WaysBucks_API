@@ -167,7 +167,7 @@ exports.addTransaction = async (req, res) => {
             userId,
             attachment: false
         }
-        // console.log(transactionData);
+        console.log(transactionData);
         
         const transaction = await Transaction.create(transactionData, {
             include: [{
