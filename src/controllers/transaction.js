@@ -167,9 +167,9 @@ exports.addTransaction = async (req, res) => {
             userId,
             attachment: false
         }
-        console.log(transactionData);
+        // console.log(transactionData);
         
-        const transaction = await Transaction.create(transactionData, {
+        await Transaction.create(transactionData, {
             include: [{
                 association: "transactionProducts",
                 attributes: {
@@ -183,12 +183,13 @@ exports.addTransaction = async (req, res) => {
                 }]
             }]
         });
+
         res.send({
             status: statusSuccess,
             message: messageSuccess("created"),
-            data: {
-                transaction
-            }
+            // data: {
+            //     transaction
+            // }
         })
     } catch (err) {
         return errorResponse(err, res);
