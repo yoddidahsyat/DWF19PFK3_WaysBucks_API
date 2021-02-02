@@ -169,17 +169,11 @@ exports.addTransaction = async (req, res) => {
         }
         // console.log(transactionData);
         
-        await Transaction.create(transactionData, {
+        const transaction = await Transaction.create(transactionData, {
             include: [{
                 association: "transactionProducts",
-                attributes: {
-                    exclude: ["ProductId"]
-                },
                 include: [{
-                    association: "transactionToppings",
-                    attributes: {
-                        exclude: ["ToppingId"]
-                    }
+                    association: "transactionToppings"
                 }]
             }]
         });
@@ -187,9 +181,9 @@ exports.addTransaction = async (req, res) => {
         res.send({
             status: statusSuccess,
             message: messageSuccess("created"),
-            // data: {
-            //     transaction
-            // }
+            data: {
+                transaction
+            }
         })
     } catch (err) {
         return errorResponse(err, res);
