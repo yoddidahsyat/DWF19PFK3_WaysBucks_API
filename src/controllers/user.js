@@ -72,7 +72,7 @@ exports.getUser = async (req, res) => {
                             include: [
                                 {
                                     model: Topping,
-                                    as: "topping",
+                                    as: "toppings",
                                     attributes: {
                                         exclude: ["createdAt", "updatedAt", "ToppingId"]
                                     }
