@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      Topping.hasMany(models.TransactionTopping)
+      Topping.hasMany(models.TransactionTopping, { foreignKey: "toppingId" })
     }
   };
   Topping.init({
