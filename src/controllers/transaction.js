@@ -172,8 +172,14 @@ exports.addTransaction = async (req, res) => {
         const transaction = await Transaction.create(transactionData, {
             include: [{
                 association: "transactionProducts",
+                attributes: {
+                    exclude: ["ProductId"]
+                },
                 include: [{
-                    association: "transactionToppings"
+                    association: "transactionToppings",
+                    attributes: {
+                        exclude: ["ToppingId"]
+                    }
                 }]
             }]
         });
