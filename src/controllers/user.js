@@ -73,9 +73,9 @@ exports.getUser = async (req, res) => {
                                 {
                                     model: Topping,
                                     as: "topping",
-                                    attributes: {
-                                        exclude: ["createdAt", "updatedAt", "ToppingId"]
-                                    }
+                                    // attributes: {
+                                    //     exclude: ["createdAt", "updatedAt", "ToppingId"]
+                                    // }
                                 }
                             ]
                         }
